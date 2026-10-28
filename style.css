@@ -13,3 +13,5 @@
 .exam-picker{margin-top:30px}.exam-picker .card p{margin-top:12px}
 
 .planned-description{font-size:14px;line-height:1.8;color:#748075;margin:18px 0 0}.course-guidance{margin:30px 0;padding:24px;background:white;border:1px solid #e0e6dd;border-radius:14px}.guidance-source{font-size:12px;color:#7b877b}.course-guidance details{border-top:1px solid #edf0e9;padding:16px 0}.course-guidance details:last-child{padding-bottom:0}.course-guidance summary{cursor:pointer;font-size:14px;font-weight:600;line-height:1.7}.course-guidance p,.course-guidance li{font-size:14px;line-height:1.8;color:#748075}.course-guidance ul{padding-left:22px}.course-guidance a{color:#365b43}@media(max-width:650px){.course-guidance{padding:20px}.exam-heading{flex-wrap:wrap}}
+
+.tic-options{flex-direction:column;align-items:stretch}.tic-options label{align-items:flex-start;line-height:1.7}.tic-options input{flex-shrink:0;margin-top:4px}.tic-options .clear-answer{align-self:flex-start}

@@ -7,7 +7,19 @@ const subjects = [
 // Recursos del repositorio; no se presupone la convocatoria de los documentos.
 const resources = Object.fromEntries(subjects.map(s => [s.id, { examenes: [], simulacros: [] }]));
 resources.in.examenes.push(...inPastExams);
+resources.in.examenes.push(...inQuestionnaires.map((exam, index) => ({
+  title: exam.title, exam: exam.exam, format: 'form',
+  questions: exam.questions.length, url: `#in/cuestionario/${index}`
+})));
+resources.in.simulacros.push(...inSimulationQuestionnaires.map((exam, index) => ({
+  title: exam.title, exam: exam.exam, format: 'form', simulation: true,
+  questions: exam.questions.length, url: `#in/simulacro/${inQuestionnaires.length + index}`
+})));
 resources.ri.examenes.push(...riPastExams);
+resources.tic.examenes.push(...ticPastExams.map((exam, index) => ({
+  title: exam.title, exam: exam.exam, format: 'form',
+  questions: exam.questions.length, url: `#tic/cuestionario/${index}`
+})));
 resources.bdd.examenes.push({
   title: 'Preguntas del primer parcial',
   exam: 1,
@@ -41,7 +53,13 @@ const plannedExams = {
 function renderPlannedExams(id, section) {
   return `<div class="exam-groups">${plannedExams[id].map((group, index) => {
     const documents = resources[id][section].filter(resource => resource.exam === index + 1);
-    return `<section class="exam-group"><div class="exam-heading"><div><h2>${group.title}</h2><p>${group.topics}</p></div><span class="count">${documents.length} ${section === 'examenes' ? 'exámenes' : 'simulacros'}</span></div><p class="planned-description">${group.description}</p>${documents.length ? documents.map(resource => `<article class="resource"><div><span class="resource-type">PDF · Examen anterior${resource.legacy ? ' · Anterior a 2022' : ''}</span><h3>${resource.title}</h3><p>${resource.pages} ${resource.pages === 1 ? 'página' : 'páginas'} de enunciado${resource.solutionUrl ? ' · Soluciones disponibles por separado' : ''}</p>${resource.note ? `<p class="pdf-note">${resource.note}</p>` : ''}</div><div class="resource-actions"><a href="${resource.url}" target="_blank" rel="noopener">Abrir examen <span class="sr-only">(abre en otra pestaña)</span></a><a href="${resource.url}" download>Descargar</a>${resource.solutionUrl ? `<a href="${resource.solutionUrl}" target="_blank" rel="noopener">Ver soluciones <span class="sr-only">(abre en otra pestaña)</span></a>` : ''}</div></article>`).join('') : `<p class="group-empty">${section === 'examenes' ? 'Todavía no hay exámenes anteriores para este bloque.' : 'Todavía no hay simulacros para este bloque.'}</p>`}</section>`;
+    return `<section class="exam-group"><div class="exam-heading"><div><h2>${group.title}</h2><p>${group.topics}</p></div><span class="count">${documents.length} ${section === 'examenes' ? 'exámenes' : 'simulacros'}</span></div><p class="planned-description">${group.description}</p>${documents.length ? documents.map(resource => resource.format === 'form' ? `<article class="resource"><div><span class="resource-type">Formulario · ${resource.simulation ? 'Simulacro' : 'Preguntas oficiales'}</span><h3>${resource.title}</h3><p>${resource.questions} preguntas · Cuatro opciones y una respuesta correcta</p></div><div class="resource-actions"><a href="${resource.url}">Realizar examen →</a></div></article>` : `<article class="resource"><div><span class="resource-type">PDF · Examen anterior${resource.legacy ? ' · Anterior a 2022' : ''}</span><h3>${resource.title}</h3><p>${resource.pages} ${resource.pages === 1 ? 'página' : 'páginas'} de enunciado${resource.solutionUrl ? ' · Soluciones disponibles por separado' : ''}</p>${resource.note ? `<p class="pdf-note">${resource.note}</p>` : ''}</div><div class="resource-actions"><a href="${resource.url}" target="_blank" rel="noopener">Abrir examen <span class="sr-only">(abre en otra pestaña)</span></a><a href="${resource.url}" download>Descargar</a>${resource.solutionUrl ? `<a href="${resource.solutionUrl}" target="_blank" rel="noopener">Ver soluciones <span class="sr-only">(abre en otra pestaña)</span></a>` : ''}</div></article>`).join('') : `<p class="group-empty">${section === 'examenes' ? 'Todavía no hay exámenes anteriores para este bloque.' : 'Todavía no hay simulacros para este bloque.'}</p>`}</section>`;
+  }).join('')}</div>`;
+}
+function renderTicResources(section) {
+  return `<div class="exam-groups">${plannedExams.tic.map((group, index) => {
+    const documents = resources.tic[section].filter(resource => resource.exam === index + 1);
+    return `<section class="exam-group"><div class="exam-heading"><div><h2>${group.title}</h2><p>${group.topics}</p></div><span class="count">${documents.length} ${section === 'examenes' ? 'exámenes' : 'simulacros'}</span></div>${documents.length ? documents.map(resource => `<article class="resource"><div><span class="resource-type">Formulario · Examen anterior</span><h3>${resource.title}</h3><p>${resource.questions} preguntas tipo test · Respuesta única o múltiple</p></div><div class="resource-actions"><a href="${resource.url}">Realizar examen →</a></div></article>`).join('') : `<p class="group-empty">Todavía no hay ${section === 'examenes' ? 'exámenes anteriores' : 'simulacros'} para este cuestionario.</p>`}</section>`;
   }).join('')}</div>`;
 }
 function renderTicGuidance() {
@@ -61,6 +79,14 @@ const badge = s => `<span class="badge" style="--accent:${s.accent};--tint:${s.t
 function render() {
   const [id, requestedSection, selectedExamId] = location.hash.slice(1).split('/');
   const subject = subjects.find(s => s.id === id);
+  if (id === 'in' && ['cuestionario', 'simulacro'].includes(requestedSection)) {
+    renderInExam(main, selectedExamId);
+    return;
+  }
+  if (id === 'tic' && requestedSection === 'cuestionario') {
+    renderTicExam(main, selectedExamId);
+    return;
+  }
   if (id === 'bdd' && requestedSection === 'simulacro') {
     renderBddExam(main, selectedExamId, 'simulacros');
     return;
@@ -87,7 +113,7 @@ function render() {
       ${id === 'in' ? renderInGuidance() : ''}
       ${id === 'tic' ? renderTicGuidance() : ''}
       <nav class="tabs" aria-label="Tipo de recurso"><a href="#${id}/examenes" ${exams ? 'aria-current="page"' : ''}>Exámenes anteriores <span class="count">${resources[id].examenes.length}</span></a><a href="#${id}/simulacros" ${!exams ? 'aria-current="page"' : ''}>Simulacros <span class="count">${resources[id].simulacros.length}</span></a></nav>
-      ${id === 'bdd' ? renderBdd(section) : plannedExams[id] ? renderPlannedExams(id, section) : `<section class="empty"><h2>${exams ? 'Todavía no hay exámenes' : 'Todavía no hay simulacros'}</h2><p>Los recursos de esta asignatura aparecerán aquí cuando estén disponibles.</p></section>`}`;
+      ${id === 'bdd' ? renderBdd(section) : id === 'tic' ? renderTicResources(section) : plannedExams[id] ? renderPlannedExams(id, section) : `<section class="empty"><h2>${exams ? 'Todavía no hay exámenes' : 'Todavía no hay simulacros'}</h2><p>Los recursos de esta asignatura aparecerán aquí cuando estén disponibles.</p></section>`}`;
   }
 }
 window.addEventListener('hashchange', () => { render(); window.scrollTo(0, 0); main.setAttribute('tabindex', '-1'); main.focus({ preventScroll: true }); });
