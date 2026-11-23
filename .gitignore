@@ -1,0 +1,5 @@
+.openai/
+.tools/
+.pdf-tools/
+__pycache__/
+*.pyc
