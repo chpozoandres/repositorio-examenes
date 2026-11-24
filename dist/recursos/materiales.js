@@ -29,7 +29,18 @@ const studyMaterials = {
         "url": "recursos/bdd/apuntes/Tema_2.pdf"
       }
     ],
-    "esquemas": []
+    "esquemas": [
+      {
+        "topic": 1,
+        "name": "TEMA 1_261105_124627",
+        "url": "recursos/bdd/esquemas/TEMA 1_261105_124627.pdf"
+      },
+      {
+        "topic": 2,
+        "name": "TEMA 2 _261105_124822",
+        "url": "recursos/bdd/esquemas/TEMA 2 _261105_124822.pdf"
+      }
+    ]
   },
   "in": {
     "diapositivas": [
@@ -131,7 +142,38 @@ const studyMaterials = {
         "url": "recursos/in/apuntes/Tema_9.pdf"
       }
     ],
-    "esquemas": []
+    "esquemas": [
+      {
+        "topic": 4,
+        "name": "TEMA 4 - IN_261021_205505_261028_162432",
+        "url": "recursos/in/esquemas/TEMA 4 - IN_261021_205505_261028_162432.pdf"
+      },
+      {
+        "topic": 5,
+        "name": "TEMA 5 - IN_261026_120257-1_261028_162449",
+        "url": "recursos/in/esquemas/TEMA 5 - IN_261026_120257-1_261028_162449.pdf"
+      },
+      {
+        "topic": 6,
+        "name": "TEMA 6 - IN_261121_154254",
+        "url": "recursos/in/esquemas/TEMA 6 - IN_261121_154254.pdf"
+      },
+      {
+        "topic": 7,
+        "name": "TEMA 7 - IN_261122_122418",
+        "url": "recursos/in/esquemas/TEMA 7 - IN_261122_122418.pdf"
+      },
+      {
+        "topic": 8,
+        "name": "TEMA 8 - IN_261122_185320",
+        "url": "recursos/in/esquemas/TEMA 8 - IN_261122_185320.pdf"
+      },
+      {
+        "topic": 9,
+        "name": "TEMA 9 - IN_261124_120318",
+        "url": "recursos/in/esquemas/TEMA 9 - IN_261124_120318.pdf"
+      }
+    ]
   },
   "ri": {
     "diapositivas": [
@@ -251,6 +293,22 @@ const studyMaterials = {
         "url": "recursos/tic/apuntes/Tema_3.pdf"
       }
     ],
-    "esquemas": []
+    "esquemas": [
+      {
+        "topic": 1,
+        "name": "TEMA 1 - TIC_261023_104018_261116_182409",
+        "url": "recursos/tic/esquemas/TEMA 1 - TIC_261023_104018_261116_182409.pdf"
+      },
+      {
+        "topic": 2,
+        "name": "TEMA 2 - TIC_261113_171503_261117_091853",
+        "url": "recursos/tic/esquemas/TEMA 2 - TIC_261113_171503_261117_091853.pdf"
+      },
+      {
+        "topic": 3,
+        "name": "TEMA 3 - TIC_261116_112510_261117_091932",
+        "url": "recursos/tic/esquemas/TEMA 3 - TIC_261116_112510_261117_091932.pdf"
+      }
+    ]
   }
 };
