@@ -1,4 +1,25 @@
-const inExamCollections = [...inQuestionnaires, ...inSimulationQuestionnaires];
+const inExamCollections = [...inQuestionnaires, ...inSimulationQuestionnaires, {
+  title: 'Kahoot aleatorio · Temas 6–9', exam: 2, simulation: true, random: true,
+  source: 'Banco de preguntas de los temas 6 a 9 aportado por el usuario', questions: []
+}];
+const inRandomDistribution = { propiedades: 7, diferencias: 5, ventajas: 4, medidas: 3, calculo: 1 };
+function generateInRandomQuestions() {
+  const counts = { ...inRandomDistribution };
+  const categories = Object.keys(counts);
+  const changes = 2 + Math.floor(Math.random() * 3);
+  for (let i = 0; i < changes; i++) {
+    const available = categories.filter(category => counts[category] > 1 && counts[category] > inRandomDistribution[category] - 2);
+    const from = available[Math.floor(Math.random() * available.length)];
+    const destinations = categories.filter(category => category !== from && counts[category] < inRandomDistribution[category] + 2);
+    if (!destinations.length) continue;
+    const to = destinations[Math.floor(Math.random() * destinations.length)];
+    counts[from]--;
+    counts[to]++;
+  }
+  return Object.entries(counts).flatMap(([category, count]) =>
+    shuffleQuestions(inSecondKahootBank[category]).slice(0, count)
+  );
+}
 const inStorageKey = 'archivo-in-cuestionarios-v1';
 let inAnswers = {};
 let inStorageAvailable = true;
@@ -32,10 +53,15 @@ function renderInExam(container, selection) {
   const index = inExamCollections.findIndex((exam, i) => String(i) === selection);
   if (index < 0) { location.hash = '#in/examenes'; return; }
   const exam = inExamCollections[index];
+  if (exam.random) {
+    exam.questions = generateInRandomQuestions();
+    Object.keys(inAnswers).filter(key => key.startsWith(`${index}-`)).forEach(key => delete inAnswers[key]);
+    saveInAnswers();
+  }
   const section = exam.simulation ? 'simulacros' : 'examenes';
   let reviewed = false;
   document.title = `IN · ${exam.title} · Formulario`;
-  container.innerHTML = `<a class="back" href="#in/${section}">← Volver a IN</a><div class="eyebrow">${exam.title} · Cuestionario de teoría</div><h1>${exam.title}</h1><p class="intro">Selecciona una respuesta por pregunta. El orden de las preguntas es aleatorio.</p><p class="exam-source">Fuente: ${escapeExamText(exam.source)}. ${exam.questions.length} preguntas. Respuestas y explicaciones facilitadas por el usuario.</p><form id="bdd-exam"><div class="exam-toolbar"><span id="in-progress" role="status"></span><div><button type="submit">Corregir examen</button><button type="button" class="secondary" id="in-reset">Reiniciar</button></div></div><p id="in-save-status" class="exam-source"></p><section id="in-result" class="exam-result" tabindex="-1" hidden></section><section class="question-group">${shuffleQuestions(exam.questions).map((q, position) => {
+  container.innerHTML = `<a class="back" href="#in/${section}">← Volver a IN</a><div class="eyebrow">${exam.title} · Cuestionario de teoría</div><h1>${exam.title}</h1><p class="intro">Selecciona una respuesta por pregunta. ${exam.random ? 'Cada intento combina 20 preguntas de los temas 6 a 9. El reparto por tipo de pregunta varía ligeramente y el orden es aleatorio.' : 'El orden de las preguntas es aleatorio.'}</p><p class="exam-source">Fuente: ${escapeExamText(exam.source)}. ${exam.questions.length} preguntas. Respuestas y explicaciones facilitadas por el usuario.</p><form id="bdd-exam"><div class="exam-toolbar"><span id="in-progress" role="status"></span><div><button type="submit">Corregir examen</button><button type="button" class="secondary" id="in-reset">${exam.random ? 'Nuevo Kahoot' : 'Reiniciar'}</button></div></div><p id="in-save-status" class="exam-source"></p><section id="in-result" class="exam-result" tabindex="-1" hidden></section><section class="question-group">${shuffleQuestions(exam.questions).map((q, position) => {
     const key = `${index}-${q.number}`;
     return `<fieldset class="exam-question" id="in-question-${q.number}"><legend><span class="question-number">${position + 1}.</span> ${escapeExamText(q.prompt)}</legend><p class="exam-source">${q.correct.length > 1 ? 'Varias respuestas posibles' : 'Una respuesta'}</p><div class="answer-options tic-options">${q.options.map((option, oi) => `<label><input type="${q.correct.length > 1 ? 'checkbox' : 'radio'}" name="${key}" value="${oi}" ${(inAnswers[key] || []).includes(oi) ? 'checked' : ''}><span>${String.fromCharCode(97 + oi)}. ${escapeExamText(option)}</span></label>`).join('')}<button type="button" class="clear-answer" data-clear="${key}">Dejar en blanco</button></div>${q.reviewNote ? `<p class="exam-notice">${escapeExamText(q.reviewNote)}</p>` : ''}<p class="answer-feedback" hidden></p></fieldset>`;
   }).join('')}</section><button type="submit">Corregir examen</button></form>`;

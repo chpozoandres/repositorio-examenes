@@ -15,6 +15,10 @@ resources.in.simulacros.push(...inSimulationQuestionnaires.map((exam, index) => 
   exam: 2, title: exam.title, exam: exam.exam, format: 'form', simulation: true,
   questions: exam.questions.length, url: `#in/simulacro/${inQuestionnaires.length + index}`
 })));
+resources.in.simulacros.push({
+  title: 'Kahoot aleatorio · Temas 6–9', exam: 2, format: 'form', simulation: true,
+  questions: 20, url: `#in/simulacro/${inQuestionnaires.length + inSimulationQuestionnaires.length}`
+});
 resources.ri.examenes.push(...riPastExams);
 resources.tic.examenes.push(...ticPastExams.map((exam, index) => ({
   title: exam.title, exam: exam.exam, format: 'form',
